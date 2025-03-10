@@ -85,6 +85,7 @@ def test_author_can_edit_note(author_client, form_data, note):
     assert note.text == form_data['text']
     assert note.slug == form_data['slug'] 
 
+
 def test_other_user_cant_edit_note(not_author_client, form_data, note):
     url = reverse('notes:edit', args=(note.slug,))
     response = not_author_client.post(url, form_data)
@@ -97,6 +98,7 @@ def test_other_user_cant_edit_note(not_author_client, form_data, note):
     assert note.text == note_from_db.text
     assert note.slug == note_from_db.slug 
 
+
 def test_author_can_delete_note(author_client, slug_for_args):
     url = reverse('notes:delete', args=slug_for_args)
     response = author_client.post(url)
@@ -108,4 +110,4 @@ def test_other_user_cant_delete_note(not_author_client, slug_for_args):
     url = reverse('notes:delete', args=slug_for_args)
     response = not_author_client.post(url)
     assert response.status_code == HTTPStatus.NOT_FOUND
-    assert Note.objects.count() == 1 
+    assert Note.objects.count() == 1

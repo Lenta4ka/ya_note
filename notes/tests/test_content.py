@@ -14,7 +14,8 @@ class TestHomePage(TestCase):
     def setUpTestData(cls):
         cls.author = User.objects.create(username='Lena')
         cls.no_author = User.objects.create(username='Gena')
-        cls.note = Note.objects.create(author=cls.author,
+        cls.note = Note.objects.create(
+            author=cls.author,
             text='Текст комментария',
             title='Заголовок',
             slug='Slug')

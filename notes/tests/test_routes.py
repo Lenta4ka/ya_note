@@ -46,7 +46,7 @@ class TestRoutes(TestCase):
         for user, status in users_statuses:
             self.client.force_login(user)
             for name in ('notes:edit', 'notes:delete'):
-                with self.subTest(user=user, name=name):       
+                with self.subTest(user=user, name=name):
                     url = reverse(name, args=(self.notes.slug,))
                     response = self.client.get(url)
                     self.assertEqual(response.status_code, status)

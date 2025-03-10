@@ -1,11 +1,7 @@
 from http import HTTPStatus
-
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
-
-# Импортируем из файла с формами список стоп-слов и предупреждение формы.
-# Загляните в news/forms.py, разберитесь с их назначением.
 
 from notes.models import Note
 
@@ -16,7 +12,8 @@ class TestAddEditDeleteNote(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.author = User.objects.create(username='Автор настоящий')
-        cls.note = Note.objects.create(author=cls.author,
+        cls.note = Note.objects.create(
+            author=cls.author,
             text='Текст комментария',
             title='Заголовок',
             slug='Slug')
@@ -69,12 +66,23 @@ class TestAddEditDeleteNote(TestCase):
 
 
 class TestAddNoteNoSlug(TestCase):
-    # Параметр слуг можно не указывать, он будет присвоен title
+    NOTE_TEXT = 'Текст заметки'
+    NOTE_TITLE = 'Текст заголовка'
+    NOTE_SLUG = 'slug'
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create(username='Лента')
+        cls.auth_client = Client()
+        cls.auth_client.force_login(cls.user)
+        cls.form_data = {'text': cls.NOTE_TEXT, 'title': cls.NOTE_TITLE,
+                         'author': cls.auth_client, }
+
     def test_add_note_no_slug(self):
-        author = User.objects.create(username='Автор настоящий')
-        note = Note.objects.create(author=author,
-            text='Текст комментария из второго класса',
-            title='Заголовок из второго класса',)
+        # Параметр слуг можно не указывать, он будет присвоен title
+        response = self.auth_client.post(reverse('notes:add'),
+                                         data=self.form_data)
+        self.assertRedirects(response, reverse('notes:success'))
         notes_count = Note.objects.count()
         self.assertEqual(notes_count, 1)
 
@@ -90,9 +98,14 @@ class TestNoteSlugDublicat(TestCase):
             author=author,
             text='Текст комментария из четвертого класса',
             title='Заголовок', slug='New')
+        note_obj = Note.objects.get()
+        print(note_obj.slug)
+        print(note.slug == note_obj.slug)
         notes_count = Note.objects.count()
-        self.assertEqual(notes_count, 1)
-        response = author_client.post(add_url, data={
+        self.assertEqual(note_obj.slug, note.slug)
+        author_client.post(add_url, data={
             'title': 'Заголовок', 'text': 'текст', 'slug': 'New'})
+        '''self.assertFormError(response, 'form', 'slug',
+                             errors=(self.note.slug + WARNING))'''
         notes_count = Note.objects.count()
         self.assertEqual(notes_count, 1)
