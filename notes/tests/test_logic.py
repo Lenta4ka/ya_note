@@ -21,7 +21,6 @@ class TestAddEditDeleteNote(TestCase):
         cls.edit_url = reverse('notes:edit', args=(cls.note.slug,))
         cls.delete_url = reverse('notes:delete', args=(cls.note.slug,))
         cls.done_url = reverse('notes:success')
-
         cls.user = User.objects.create(username='Не авторизованный юзер')
         cls.user = Client()
         cls.author_client = Client()

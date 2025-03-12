@@ -3,12 +3,12 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 
 from notes.models import Note
-
+from notes.tests.test_class import TestAuthorNoteUrl
 
 User = get_user_model()
 
 
-class TestHomePage(TestCase):
+class TestHomePage(TestAuthorNoteUrl):
 
     @classmethod
     def setUpTestData(cls):
@@ -36,9 +36,11 @@ class TestHomePage(TestCase):
         self.assertNotIn(self.note, response.context['object_list'])
 
     def test_form_in_add_and_edit(self):
+
         # Проверка передачи формы на страницы редактирования и создания
         urls_form = ((self.edit_url, 'form'), (self.add_url, 'form'))
         self.client.force_login(self.author)
         for url, form in urls_form:
-            response = self.client.get(url)
-            self.assertIn(form, response.context)
+            with self.subTest (url=url, form=form):
+                response = self.client.get(url)
+                self.assertIn(form, response.context)
